@@ -1,0 +1,1832 @@
+schema_version: geonirs_benchmark_v1
+title: 'GeoNIRS: Geometry-Aware Pretraining for Heterogeneous fNIRS Representation Learning'
+paper_benchmark:
+  datasets:
+  - DS7
+  - DS47
+  - DS36
+  - DS19
+  - DS70E
+  - DS2
+  - DS8
+  - DS42
+  folds: 5
+  seeds:
+  - 810
+  - 811
+evaluation:
+  split_unit: subject
+  selection_metric: validation_balanced_accuracy
+  metrics:
+  - balanced_accuracy
+  - macro_f1
+  - auroc
+  adaptation_arms:
+  - lp
+  - lora
+  - ft
+fair_input:
+  policy: B
+  policy_name: CHANNEL_INTERSECTION
+  missing_value_fill: 0.0
+  zero_padding_owner: FairInputBuilder
+  model_internal_preprocessing: FORBIDDEN
+  allowed_model_operations:
+  - reshape
+  - permute
+  forbidden_model_operations:
+  - filtering
+  - zscore
+  - normalization
+  - interpolation
+  - channel_selection
+  - sample_rejection
+  - qc
+  - rewinding
+  - rewindowing
+  geometry_scope: DATASET_LEVEL_FIXED
+  geometry_variant: dataset_level_C_normalized_midpoint_delta
+  geometry_fields:
+  - midpoint_x
+  - midpoint_y
+  - midpoint_z
+  - delta_x
+  - delta_y
+  - delta_z
+  records: benchmark/fair_input/RECORDS.json
+  records_sha256: 933b30e9382c911ad0c8dd8875d930b54f4b27742e7f55532c32f2888a03dd91
+  index_dir: benchmark/fair_input/index
+  tensor: benchmark/fair_input/GEONIRS_FAIR_INPUT.h5
+model:
+  name: GeoNIRS
+  source: model/ours.py
+  class: model.ours.Ours
+  sizes:
+    base:
+      parameters: 6511214
+      embedding_dim: 192
+      temporal_layers: 4
+      pretrain_config: pretrain/configs/base.yaml
+    large:
+      parameters: 30146414
+      embedding_dim: 384
+      temporal_layers: 6
+      pretrain_config: pretrain/configs/large.yaml
+  checkpoints:
+    base:
+      path: pretrain_checkpoint/geonirs_base.pt
+      sha256: 0feee1c906d273cd649b6477b932a0cb53906bca91f3cf8c2def486249ec172d
+      pretrain_epoch: 64
+    mae:
+      path: pretrain_checkpoint/geonirs_mae.pt
+      sha256: c254348b83ca818c0cb166e29937ffb60c29c1e642bab43c074682175bfbfec0
+      pretrain_epoch: 107
+    large:
+      path: pretrain_checkpoint/geonirs_large.pt
+      sha256: null
+      note: the large weights are published with the paper; pin their digest in the Hugging Face model
+        card before citing a number that was produced with them
+datasets:
+  DS7:
+    task:
+      name: Healthy vs ICH
+      labels:
+      - Healthy
+      - ICH
+    canonical_root: data/canonical/DS7
+    sampling_rate_hz: 5
+    manifest: benchmark/manifests/DS7.csv
+    manifest_sha256: a94be12f75e089690309a631a0aff1c2f146d60e490666ea7acf39d70845a817
+    manifest_rows: 2970
+    class_counts:
+      Healthy: 1500
+      ICH: 1470
+    index_csv: benchmark/fair_input/index/DS7.csv
+    folds:
+      1:
+        train_subjects:
+        - H11
+        - H12
+        - H13
+        - H16
+        - H17
+        - H2
+        - H5
+        - H6
+        - H7
+        - I1
+        - I10
+        - I11
+        - I14
+        - I15
+        - I16
+        - I19
+        - I2
+        - I20
+        - I5
+        - I6
+        - I7
+        validation_subjects:
+        - H10
+        - H15
+        - H4
+        - H9
+        - I13
+        - I18
+        - I4
+        - I9
+        test_subjects:
+        - H1
+        - H14
+        - H3
+        - H8
+        - I12
+        - I17
+        - I3
+        - I8
+      2:
+        train_subjects:
+        - H1
+        - H12
+        - H13
+        - H14
+        - H17
+        - H2
+        - H3
+        - H6
+        - H7
+        - H8
+        - I10
+        - I11
+        - I12
+        - I15
+        - I16
+        - I17
+        - I2
+        - I20
+        - I3
+        - I6
+        - I7
+        - I8
+        validation_subjects:
+        - H11
+        - H16
+        - H5
+        - I1
+        - I14
+        - I19
+        - I5
+        test_subjects:
+        - H10
+        - H15
+        - H4
+        - H9
+        - I13
+        - I18
+        - I4
+        - I9
+      3:
+        train_subjects:
+        - H1
+        - H10
+        - H13
+        - H14
+        - H15
+        - H2
+        - H3
+        - H4
+        - H7
+        - H8
+        - H9
+        - I11
+        - I12
+        - I13
+        - I16
+        - I17
+        - I18
+        - I20
+        - I3
+        - I4
+        - I7
+        - I8
+        - I9
+        validation_subjects:
+        - H12
+        - H17
+        - H6
+        - I10
+        - I15
+        - I2
+        - I6
+        test_subjects:
+        - H11
+        - H16
+        - H5
+        - I1
+        - I14
+        - I19
+        - I5
+      4:
+        train_subjects:
+        - H1
+        - H10
+        - H11
+        - H14
+        - H15
+        - H16
+        - H3
+        - H4
+        - H5
+        - H8
+        - H9
+        - I1
+        - I12
+        - I13
+        - I14
+        - I17
+        - I18
+        - I19
+        - I3
+        - I4
+        - I5
+        - I8
+        - I9
+        validation_subjects:
+        - H13
+        - H2
+        - H7
+        - I11
+        - I16
+        - I20
+        - I7
+        test_subjects:
+        - H12
+        - H17
+        - H6
+        - I10
+        - I15
+        - I2
+        - I6
+      5:
+        train_subjects:
+        - H10
+        - H11
+        - H12
+        - H15
+        - H16
+        - H17
+        - H4
+        - H5
+        - H6
+        - H9
+        - I1
+        - I10
+        - I13
+        - I14
+        - I15
+        - I18
+        - I19
+        - I2
+        - I4
+        - I5
+        - I6
+        - I9
+        validation_subjects:
+        - H1
+        - H14
+        - H3
+        - H8
+        - I12
+        - I17
+        - I3
+        - I8
+        test_subjects:
+        - H13
+        - H2
+        - H7
+        - I11
+        - I16
+        - I20
+        - I7
+  DS47:
+    task:
+      name: Cochlear implant vs normal hearing
+      labels:
+      - NH
+      - CI
+    canonical_root: data/canonical/DS47
+    sampling_rate_hz: 5
+    manifest: benchmark/manifests/DS47.csv
+    manifest_sha256: 2e89941b4009f2456aafc16bd5aff94dfca1cf14bc3f81bc3ffef6c35b0d92c4
+    manifest_rows: 2872
+    class_counts:
+      NH: 1033
+      CI: 1839
+    index_csv: benchmark/fair_input/index/DS47.csv
+    folds:
+      1:
+        train_subjects:
+        - sub-C03
+        - sub-C04
+        - sub-C05
+        - sub-C08
+        - sub-C09
+        - sub-C10
+        - sub-C13
+        - sub-C14
+        - sub-C15
+        - sub-C18
+        - sub-C19
+        - sub-C20
+        - sub-C23
+        - sub-C24
+        - sub-C25
+        - sub-S02
+        - sub-S03
+        - sub-S04
+        - sub-S07
+        - sub-S08
+        - sub-S09
+        - sub-S12
+        - sub-S13
+        - sub-S14
+        - sub-S17
+        - sub-S18
+        - sub-S19
+        - sub-S22
+        - sub-S23
+        - sub-S24
+        - sub-S27
+        - sub-S28
+        - sub-S29
+        - sub-S32
+        - sub-S33
+        - sub-S34
+        - sub-S37
+        - sub-S38
+        - sub-S39
+        - sub-S42
+        - sub-S43
+        - sub-S44
+        validation_subjects:
+        - sub-C02
+        - sub-C07
+        - sub-C12
+        - sub-C17
+        - sub-C22
+        - sub-S01
+        - sub-S06
+        - sub-S11
+        - sub-S16
+        - sub-S21
+        - sub-S26
+        - sub-S31
+        - sub-S36
+        - sub-S41
+        - sub-S46
+        test_subjects:
+        - sub-C01
+        - sub-C06
+        - sub-C11
+        - sub-C16
+        - sub-C21
+        - sub-C26
+        - sub-S05
+        - sub-S10
+        - sub-S15
+        - sub-S20
+        - sub-S25
+        - sub-S30
+        - sub-S35
+        - sub-S40
+        - sub-S45
+      2:
+        train_subjects:
+        - sub-C01
+        - sub-C04
+        - sub-C05
+        - sub-C06
+        - sub-C09
+        - sub-C10
+        - sub-C11
+        - sub-C14
+        - sub-C15
+        - sub-C16
+        - sub-C19
+        - sub-C20
+        - sub-C21
+        - sub-C24
+        - sub-C25
+        - sub-C26
+        - sub-S03
+        - sub-S04
+        - sub-S05
+        - sub-S08
+        - sub-S09
+        - sub-S10
+        - sub-S13
+        - sub-S14
+        - sub-S15
+        - sub-S18
+        - sub-S19
+        - sub-S20
+        - sub-S23
+        - sub-S24
+        - sub-S25
+        - sub-S28
+        - sub-S29
+        - sub-S30
+        - sub-S33
+        - sub-S34
+        - sub-S35
+        - sub-S38
+        - sub-S39
+        - sub-S40
+        - sub-S43
+        - sub-S44
+        - sub-S45
+        validation_subjects:
+        - sub-C03
+        - sub-C08
+        - sub-C13
+        - sub-C18
+        - sub-C23
+        - sub-S02
+        - sub-S07
+        - sub-S12
+        - sub-S17
+        - sub-S22
+        - sub-S27
+        - sub-S32
+        - sub-S37
+        - sub-S42
+        test_subjects:
+        - sub-C02
+        - sub-C07
+        - sub-C12
+        - sub-C17
+        - sub-C22
+        - sub-S01
+        - sub-S06
+        - sub-S11
+        - sub-S16
+        - sub-S21
+        - sub-S26
+        - sub-S31
+        - sub-S36
+        - sub-S41
+        - sub-S46
+      3:
+        train_subjects:
+        - sub-C01
+        - sub-C02
+        - sub-C05
+        - sub-C06
+        - sub-C07
+        - sub-C10
+        - sub-C11
+        - sub-C12
+        - sub-C15
+        - sub-C16
+        - sub-C17
+        - sub-C20
+        - sub-C21
+        - sub-C22
+        - sub-C25
+        - sub-C26
+        - sub-S01
+        - sub-S04
+        - sub-S05
+        - sub-S06
+        - sub-S09
+        - sub-S10
+        - sub-S11
+        - sub-S14
+        - sub-S15
+        - sub-S16
+        - sub-S19
+        - sub-S20
+        - sub-S21
+        - sub-S24
+        - sub-S25
+        - sub-S26
+        - sub-S29
+        - sub-S30
+        - sub-S31
+        - sub-S34
+        - sub-S35
+        - sub-S36
+        - sub-S39
+        - sub-S40
+        - sub-S41
+        - sub-S44
+        - sub-S45
+        - sub-S46
+        validation_subjects:
+        - sub-C04
+        - sub-C09
+        - sub-C14
+        - sub-C19
+        - sub-C24
+        - sub-S03
+        - sub-S08
+        - sub-S13
+        - sub-S18
+        - sub-S23
+        - sub-S28
+        - sub-S33
+        - sub-S38
+        - sub-S43
+        test_subjects:
+        - sub-C03
+        - sub-C08
+        - sub-C13
+        - sub-C18
+        - sub-C23
+        - sub-S02
+        - sub-S07
+        - sub-S12
+        - sub-S17
+        - sub-S22
+        - sub-S27
+        - sub-S32
+        - sub-S37
+        - sub-S42
+      4:
+        train_subjects:
+        - sub-C01
+        - sub-C02
+        - sub-C03
+        - sub-C06
+        - sub-C07
+        - sub-C08
+        - sub-C11
+        - sub-C12
+        - sub-C13
+        - sub-C16
+        - sub-C17
+        - sub-C18
+        - sub-C21
+        - sub-C22
+        - sub-C23
+        - sub-C26
+        - sub-S01
+        - sub-S02
+        - sub-S05
+        - sub-S06
+        - sub-S07
+        - sub-S10
+        - sub-S11
+        - sub-S12
+        - sub-S15
+        - sub-S16
+        - sub-S17
+        - sub-S20
+        - sub-S21
+        - sub-S22
+        - sub-S25
+        - sub-S26
+        - sub-S27
+        - sub-S30
+        - sub-S31
+        - sub-S32
+        - sub-S35
+        - sub-S36
+        - sub-S37
+        - sub-S40
+        - sub-S41
+        - sub-S42
+        - sub-S45
+        - sub-S46
+        validation_subjects:
+        - sub-C05
+        - sub-C10
+        - sub-C15
+        - sub-C20
+        - sub-C25
+        - sub-S04
+        - sub-S09
+        - sub-S14
+        - sub-S19
+        - sub-S24
+        - sub-S29
+        - sub-S34
+        - sub-S39
+        - sub-S44
+        test_subjects:
+        - sub-C04
+        - sub-C09
+        - sub-C14
+        - sub-C19
+        - sub-C24
+        - sub-S03
+        - sub-S08
+        - sub-S13
+        - sub-S18
+        - sub-S23
+        - sub-S28
+        - sub-S33
+        - sub-S38
+        - sub-S43
+      5:
+        train_subjects:
+        - sub-C02
+        - sub-C03
+        - sub-C04
+        - sub-C07
+        - sub-C08
+        - sub-C09
+        - sub-C12
+        - sub-C13
+        - sub-C14
+        - sub-C17
+        - sub-C18
+        - sub-C19
+        - sub-C22
+        - sub-C23
+        - sub-C24
+        - sub-S01
+        - sub-S02
+        - sub-S03
+        - sub-S06
+        - sub-S07
+        - sub-S08
+        - sub-S11
+        - sub-S12
+        - sub-S13
+        - sub-S16
+        - sub-S17
+        - sub-S18
+        - sub-S21
+        - sub-S22
+        - sub-S23
+        - sub-S26
+        - sub-S27
+        - sub-S28
+        - sub-S31
+        - sub-S32
+        - sub-S33
+        - sub-S36
+        - sub-S37
+        - sub-S38
+        - sub-S41
+        - sub-S42
+        - sub-S43
+        - sub-S46
+        validation_subjects:
+        - sub-C01
+        - sub-C06
+        - sub-C11
+        - sub-C16
+        - sub-C21
+        - sub-C26
+        - sub-S05
+        - sub-S10
+        - sub-S15
+        - sub-S20
+        - sub-S25
+        - sub-S30
+        - sub-S35
+        - sub-S40
+        - sub-S45
+        test_subjects:
+        - sub-C05
+        - sub-C10
+        - sub-C15
+        - sub-C20
+        - sub-C25
+        - sub-S04
+        - sub-S09
+        - sub-S14
+        - sub-S19
+        - sub-S24
+        - sub-S29
+        - sub-S34
+        - sub-S39
+        - sub-S44
+  DS36:
+    task:
+      name: Tinnitus vs healthy control
+      labels:
+      - Tinnitus
+      - Control
+    canonical_root: data/canonical/DS36
+    sampling_rate_hz: 5
+    manifest: benchmark/manifests/DS36.csv
+    manifest_sha256: 299ab4bedb38a01907b3c2e50d8d3cb7a83452c23a2f55496034cede04837843
+    manifest_rows: 1260
+    class_counts:
+      Tinnitus: 580
+      Control: 680
+    index_csv: benchmark/fair_input/index/DS36.csv
+    folds:
+      1:
+        train_subjects:
+        - sub-001
+        - sub-003
+        - sub-004
+        - sub-005
+        - sub-007
+        - sub-008
+        - sub-009
+        - sub-012
+        - sub-014
+        - sub-015
+        - sub-016
+        - sub-017
+        - sub-018
+        - sub-019
+        - sub-024
+        - sub-025
+        - sub-026
+        - sub-027
+        - sub-028
+        - sub-030
+        - sub-031
+        - sub-032
+        - sub-033
+        - sub-035
+        - sub-104
+        - sub-106
+        - sub-108
+        - sub-109
+        - sub-111
+        - sub-112
+        - sub-113
+        - sub-114
+        - sub-115
+        - sub-121
+        - sub-124
+        - sub-126
+        - sub-128
+        validation_subjects:
+        - sub-002
+        - sub-006
+        - sub-011
+        - sub-020
+        - sub-023
+        - sub-101
+        - sub-107
+        - sub-116
+        - sub-122
+        - sub-123
+        - sub-125
+        - sub-127
+        - sub-130
+        test_subjects:
+        - sub-010
+        - sub-021
+        - sub-022
+        - sub-029
+        - sub-034
+        - sub-102
+        - sub-103
+        - sub-105
+        - sub-110
+        - sub-117
+        - sub-118
+        - sub-119
+        - sub-129
+      2:
+        train_subjects:
+        - sub-001
+        - sub-005
+        - sub-008
+        - sub-010
+        - sub-012
+        - sub-014
+        - sub-016
+        - sub-017
+        - sub-018
+        - sub-019
+        - sub-021
+        - sub-022
+        - sub-026
+        - sub-027
+        - sub-028
+        - sub-029
+        - sub-031
+        - sub-032
+        - sub-033
+        - sub-034
+        - sub-102
+        - sub-103
+        - sub-104
+        - sub-105
+        - sub-108
+        - sub-109
+        - sub-110
+        - sub-111
+        - sub-113
+        - sub-114
+        - sub-115
+        - sub-117
+        - sub-118
+        - sub-119
+        - sub-124
+        - sub-128
+        - sub-129
+        validation_subjects:
+        - sub-003
+        - sub-004
+        - sub-007
+        - sub-009
+        - sub-015
+        - sub-024
+        - sub-025
+        - sub-030
+        - sub-035
+        - sub-106
+        - sub-112
+        - sub-121
+        - sub-126
+        test_subjects:
+        - sub-002
+        - sub-006
+        - sub-011
+        - sub-020
+        - sub-023
+        - sub-101
+        - sub-107
+        - sub-116
+        - sub-122
+        - sub-123
+        - sub-125
+        - sub-127
+        - sub-130
+      3:
+        train_subjects:
+        - sub-002
+        - sub-005
+        - sub-006
+        - sub-010
+        - sub-011
+        - sub-019
+        - sub-020
+        - sub-021
+        - sub-022
+        - sub-023
+        - sub-026
+        - sub-027
+        - sub-029
+        - sub-031
+        - sub-032
+        - sub-033
+        - sub-034
+        - sub-101
+        - sub-102
+        - sub-103
+        - sub-104
+        - sub-105
+        - sub-107
+        - sub-108
+        - sub-110
+        - sub-111
+        - sub-113
+        - sub-114
+        - sub-116
+        - sub-117
+        - sub-118
+        - sub-119
+        - sub-122
+        - sub-123
+        - sub-125
+        - sub-127
+        - sub-129
+        - sub-130
+        validation_subjects:
+        - sub-001
+        - sub-008
+        - sub-012
+        - sub-014
+        - sub-016
+        - sub-017
+        - sub-018
+        - sub-028
+        - sub-109
+        - sub-115
+        - sub-124
+        - sub-128
+        test_subjects:
+        - sub-003
+        - sub-004
+        - sub-007
+        - sub-009
+        - sub-015
+        - sub-024
+        - sub-025
+        - sub-030
+        - sub-035
+        - sub-106
+        - sub-112
+        - sub-121
+        - sub-126
+      4:
+        train_subjects:
+        - sub-002
+        - sub-003
+        - sub-004
+        - sub-006
+        - sub-007
+        - sub-009
+        - sub-010
+        - sub-011
+        - sub-015
+        - sub-020
+        - sub-021
+        - sub-022
+        - sub-023
+        - sub-024
+        - sub-025
+        - sub-029
+        - sub-030
+        - sub-034
+        - sub-035
+        - sub-101
+        - sub-102
+        - sub-103
+        - sub-105
+        - sub-106
+        - sub-107
+        - sub-110
+        - sub-112
+        - sub-116
+        - sub-117
+        - sub-118
+        - sub-119
+        - sub-121
+        - sub-122
+        - sub-123
+        - sub-125
+        - sub-126
+        - sub-127
+        - sub-129
+        - sub-130
+        validation_subjects:
+        - sub-005
+        - sub-019
+        - sub-026
+        - sub-027
+        - sub-031
+        - sub-032
+        - sub-033
+        - sub-104
+        - sub-108
+        - sub-111
+        - sub-113
+        - sub-114
+        test_subjects:
+        - sub-001
+        - sub-008
+        - sub-012
+        - sub-014
+        - sub-016
+        - sub-017
+        - sub-018
+        - sub-028
+        - sub-109
+        - sub-115
+        - sub-124
+        - sub-128
+      5:
+        train_subjects:
+        - sub-001
+        - sub-002
+        - sub-003
+        - sub-004
+        - sub-006
+        - sub-007
+        - sub-008
+        - sub-009
+        - sub-011
+        - sub-012
+        - sub-014
+        - sub-015
+        - sub-016
+        - sub-017
+        - sub-018
+        - sub-020
+        - sub-023
+        - sub-024
+        - sub-025
+        - sub-028
+        - sub-030
+        - sub-035
+        - sub-101
+        - sub-106
+        - sub-107
+        - sub-109
+        - sub-112
+        - sub-115
+        - sub-116
+        - sub-121
+        - sub-122
+        - sub-123
+        - sub-124
+        - sub-125
+        - sub-126
+        - sub-127
+        - sub-128
+        - sub-130
+        validation_subjects:
+        - sub-010
+        - sub-021
+        - sub-022
+        - sub-029
+        - sub-034
+        - sub-102
+        - sub-103
+        - sub-105
+        - sub-110
+        - sub-117
+        - sub-118
+        - sub-119
+        - sub-129
+        test_subjects:
+        - sub-005
+        - sub-019
+        - sub-026
+        - sub-027
+        - sub-031
+        - sub-032
+        - sub-033
+        - sub-104
+        - sub-108
+        - sub-111
+        - sub-113
+        - sub-114
+  DS19:
+    task:
+      name: Electrical pain intensity (VAS 3 vs VAS 7)
+      labels:
+      - Low pain
+      - High pain
+    canonical_root: data/canonical/DS19
+    sampling_rate_hz: 5
+    manifest: benchmark/manifests/DS19.csv
+    manifest_sha256: 543654337fd27246a028bc3f5082ff2460f0339c448ecc701224ad5309d91cec
+    manifest_rows: 1260
+    class_counts:
+      Low pain: 630
+      High pain: 630
+    index_csv: benchmark/fair_input/index/DS19.csv
+    folds:
+      1:
+        train_subjects:
+        - sub-005
+        - sub-009
+        - sub-010
+        - sub-011
+        - sub-013
+        - sub-016
+        - sub-017
+        - sub-018
+        validation_subjects:
+        - sub-012
+        - sub-014
+        - sub-019
+        test_subjects:
+        - sub-002
+        - sub-015
+        - sub-020
+      2:
+        train_subjects:
+        - sub-002
+        - sub-005
+        - sub-009
+        - sub-011
+        - sub-015
+        - sub-017
+        - sub-018
+        - sub-020
+        validation_subjects:
+        - sub-010
+        - sub-013
+        - sub-016
+        test_subjects:
+        - sub-012
+        - sub-014
+        - sub-019
+      3:
+        train_subjects:
+        - sub-002
+        - sub-009
+        - sub-012
+        - sub-014
+        - sub-015
+        - sub-017
+        - sub-019
+        - sub-020
+        validation_subjects:
+        - sub-005
+        - sub-011
+        - sub-018
+        test_subjects:
+        - sub-010
+        - sub-013
+        - sub-016
+      4:
+        train_subjects:
+        - sub-002
+        - sub-010
+        - sub-012
+        - sub-013
+        - sub-014
+        - sub-015
+        - sub-016
+        - sub-019
+        - sub-020
+        validation_subjects:
+        - sub-009
+        - sub-017
+        test_subjects:
+        - sub-005
+        - sub-011
+        - sub-018
+      5:
+        train_subjects:
+        - sub-005
+        - sub-010
+        - sub-011
+        - sub-012
+        - sub-013
+        - sub-014
+        - sub-016
+        - sub-018
+        - sub-019
+        validation_subjects:
+        - sub-002
+        - sub-015
+        - sub-020
+        test_subjects:
+        - sub-009
+        - sub-017
+  DS70E:
+    task:
+      name: MULPA emotion (happy vs sad)
+      labels:
+      - Sad
+      - Happy
+    canonical_root: data/canonical/DS70
+    sampling_rate_hz: 5
+    manifest: benchmark/manifests/DS70E.csv
+    manifest_sha256: 6669b4888048f17da9aa692b531ad87e6191c5b4842843d316af6bf7c1ecc756
+    manifest_rows: 620
+    class_counts:
+      Sad: 310
+      Happy: 310
+    index_csv: benchmark/fair_input/index/DS70E.csv
+    folds:
+      1:
+        train_subjects:
+        - sub-02
+        - sub-03
+        - sub-04
+        - sub-06
+        - sub-07
+        - sub-08
+        - sub-12
+        - sub-14
+        - sub-15
+        - sub-16
+        - sub-17
+        - sub-19
+        - sub-22
+        - sub-23
+        - sub-24
+        - sub-25
+        - sub-27
+        - sub-29
+        - sub-30
+        - sub-35
+        - sub-37
+        - sub-39
+        - sub-45
+        - sub-47
+        - sub-48
+        - sub-50
+        - sub-51
+        - sub-52
+        - sub-53
+        - sub-54
+        - sub-55
+        - sub-56
+        - sub-57
+        validation_subjects:
+        - sub-10
+        - sub-11
+        - sub-18
+        - sub-20
+        - sub-21
+        - sub-28
+        - sub-32
+        - sub-33
+        - sub-34
+        - sub-38
+        - sub-40
+        test_subjects:
+        - sub-01
+        - sub-05
+        - sub-09
+        - sub-13
+        - sub-26
+        - sub-31
+        - sub-36
+        - sub-41
+        - sub-42
+        - sub-43
+        - sub-44
+        - sub-46
+      2:
+        train_subjects:
+        - sub-01
+        - sub-02
+        - sub-04
+        - sub-05
+        - sub-06
+        - sub-08
+        - sub-09
+        - sub-12
+        - sub-13
+        - sub-14
+        - sub-15
+        - sub-17
+        - sub-23
+        - sub-24
+        - sub-25
+        - sub-26
+        - sub-27
+        - sub-29
+        - sub-30
+        - sub-31
+        - sub-35
+        - sub-36
+        - sub-37
+        - sub-39
+        - sub-41
+        - sub-42
+        - sub-43
+        - sub-44
+        - sub-45
+        - sub-46
+        - sub-51
+        - sub-53
+        - sub-55
+        - sub-56
+        validation_subjects:
+        - sub-03
+        - sub-07
+        - sub-16
+        - sub-19
+        - sub-22
+        - sub-47
+        - sub-48
+        - sub-50
+        - sub-52
+        - sub-54
+        - sub-57
+        test_subjects:
+        - sub-10
+        - sub-11
+        - sub-18
+        - sub-20
+        - sub-21
+        - sub-28
+        - sub-32
+        - sub-33
+        - sub-34
+        - sub-38
+        - sub-40
+      3:
+        train_subjects:
+        - sub-01
+        - sub-04
+        - sub-05
+        - sub-06
+        - sub-08
+        - sub-09
+        - sub-10
+        - sub-11
+        - sub-13
+        - sub-15
+        - sub-17
+        - sub-18
+        - sub-20
+        - sub-21
+        - sub-25
+        - sub-26
+        - sub-27
+        - sub-28
+        - sub-31
+        - sub-32
+        - sub-33
+        - sub-34
+        - sub-36
+        - sub-37
+        - sub-38
+        - sub-39
+        - sub-40
+        - sub-41
+        - sub-42
+        - sub-43
+        - sub-44
+        - sub-45
+        - sub-46
+        - sub-56
+        validation_subjects:
+        - sub-02
+        - sub-12
+        - sub-14
+        - sub-23
+        - sub-24
+        - sub-29
+        - sub-30
+        - sub-35
+        - sub-51
+        - sub-53
+        - sub-55
+        test_subjects:
+        - sub-03
+        - sub-07
+        - sub-16
+        - sub-19
+        - sub-22
+        - sub-47
+        - sub-48
+        - sub-50
+        - sub-52
+        - sub-54
+        - sub-57
+      4:
+        train_subjects:
+        - sub-01
+        - sub-03
+        - sub-05
+        - sub-07
+        - sub-09
+        - sub-10
+        - sub-11
+        - sub-13
+        - sub-16
+        - sub-18
+        - sub-19
+        - sub-20
+        - sub-21
+        - sub-22
+        - sub-26
+        - sub-28
+        - sub-31
+        - sub-32
+        - sub-33
+        - sub-34
+        - sub-36
+        - sub-38
+        - sub-40
+        - sub-41
+        - sub-42
+        - sub-43
+        - sub-44
+        - sub-46
+        - sub-47
+        - sub-48
+        - sub-50
+        - sub-52
+        - sub-54
+        - sub-57
+        validation_subjects:
+        - sub-04
+        - sub-06
+        - sub-08
+        - sub-15
+        - sub-17
+        - sub-25
+        - sub-27
+        - sub-37
+        - sub-39
+        - sub-45
+        - sub-56
+        test_subjects:
+        - sub-02
+        - sub-12
+        - sub-14
+        - sub-23
+        - sub-24
+        - sub-29
+        - sub-30
+        - sub-35
+        - sub-51
+        - sub-53
+        - sub-55
+      5:
+        train_subjects:
+        - sub-02
+        - sub-03
+        - sub-07
+        - sub-10
+        - sub-11
+        - sub-12
+        - sub-14
+        - sub-16
+        - sub-18
+        - sub-19
+        - sub-20
+        - sub-21
+        - sub-22
+        - sub-23
+        - sub-24
+        - sub-28
+        - sub-29
+        - sub-30
+        - sub-32
+        - sub-33
+        - sub-34
+        - sub-35
+        - sub-38
+        - sub-40
+        - sub-47
+        - sub-48
+        - sub-50
+        - sub-51
+        - sub-52
+        - sub-53
+        - sub-54
+        - sub-55
+        - sub-57
+        validation_subjects:
+        - sub-01
+        - sub-05
+        - sub-09
+        - sub-13
+        - sub-26
+        - sub-31
+        - sub-36
+        - sub-41
+        - sub-42
+        - sub-43
+        - sub-44
+        - sub-46
+        test_subjects:
+        - sub-04
+        - sub-06
+        - sub-08
+        - sub-15
+        - sub-17
+        - sub-25
+        - sub-27
+        - sub-37
+        - sub-39
+        - sub-45
+        - sub-56
+  DS2:
+    task:
+      name: Mental arithmetic -- animal vs tool
+      labels:
+      - Animal
+      - Tool
+    canonical_root: data/canonical/DS2
+    sampling_rate_hz: 5
+    manifest: benchmark/manifests/DS2.csv
+    manifest_sha256: 356398e45b17edfa86cf4d64fa5fa3a950c0d41c6bc4c71aed3d7b81f0b1a91b
+    manifest_rows: 2160
+    class_counts:
+      Animal: 1080
+      Tool: 1080
+    index_csv: benchmark/fair_input/index/DS2.csv
+    folds:
+      1:
+        train_subjects:
+        - sub-07
+        - sub-08
+        - sub-09
+        - sub-10
+        - sub-11
+        - sub-12
+        validation_subjects:
+        - sub-04
+        - sub-05
+        - sub-06
+        test_subjects:
+        - sub-01
+        - sub-02
+        - sub-03
+      2:
+        train_subjects:
+        - sub-01
+        - sub-02
+        - sub-03
+        - sub-09
+        - sub-10
+        - sub-11
+        - sub-12
+        validation_subjects:
+        - sub-07
+        - sub-08
+        test_subjects:
+        - sub-04
+        - sub-05
+        - sub-06
+      3:
+        train_subjects:
+        - sub-01
+        - sub-02
+        - sub-03
+        - sub-04
+        - sub-05
+        - sub-06
+        - sub-11
+        - sub-12
+        validation_subjects:
+        - sub-09
+        - sub-10
+        test_subjects:
+        - sub-07
+        - sub-08
+      4:
+        train_subjects:
+        - sub-01
+        - sub-02
+        - sub-03
+        - sub-04
+        - sub-05
+        - sub-06
+        - sub-07
+        - sub-08
+        validation_subjects:
+        - sub-11
+        - sub-12
+        test_subjects:
+        - sub-09
+        - sub-10
+      5:
+        train_subjects:
+        - sub-04
+        - sub-05
+        - sub-06
+        - sub-07
+        - sub-08
+        - sub-09
+        - sub-10
+        validation_subjects:
+        - sub-01
+        - sub-02
+        - sub-03
+        test_subjects:
+        - sub-11
+        - sub-12
+  DS8:
+    task:
+      name: Motor execution vs rest
+      labels:
+      - Movement
+      - No movement
+    canonical_root: data/canonical/DS8
+    sampling_rate_hz: 5
+    manifest: benchmark/manifests/DS8.csv
+    manifest_sha256: 2169cd546c428b4b57fd26c652345c96d194468e434e96f404ed143a8722be58
+    manifest_rows: 5697
+    class_counts:
+      Movement: 2848
+      No movement: 2849
+    index_csv: benchmark/fair_input/index/DS8.csv
+    folds:
+      1:
+        train_subjects:
+        - L01
+        - L04
+        - L05
+        - L08
+        - L09
+        - L11
+        - L14
+        - R02
+        - R03
+        - R07
+        validation_subjects:
+        - L06
+        - L12
+        - L15
+        test_subjects:
+        - R10
+        - R13
+        - R16
+      2:
+        train_subjects:
+        - L04
+        - L06
+        - L08
+        - L09
+        - L14
+        - L15
+        - R03
+        - R07
+        - R10
+        - R16
+        validation_subjects:
+        - L01
+        - L05
+        - R13
+        test_subjects:
+        - L11
+        - L12
+        - R02
+      3:
+        train_subjects:
+        - L04
+        - L09
+        - L11
+        - L12
+        - L14
+        - L15
+        - R02
+        - R03
+        - R10
+        - R13
+        validation_subjects:
+        - L01
+        - L08
+        - R16
+        test_subjects:
+        - L05
+        - L06
+        - R07
+      4:
+        train_subjects:
+        - L05
+        - L06
+        - L09
+        - L11
+        - L12
+        - R02
+        - R03
+        - R07
+        - R10
+        - R16
+        validation_subjects:
+        - L04
+        - L15
+        - R13
+        test_subjects:
+        - L01
+        - L08
+        - L14
+      5:
+        train_subjects:
+        - L01
+        - L05
+        - L08
+        - L11
+        - L12
+        - L14
+        - R10
+        - R13
+        - R16
+        validation_subjects:
+        - L06
+        - R02
+        - R07
+        test_subjects:
+        - L04
+        - L09
+        - L15
+        - R03
+  DS42:
+    task:
+      name: Mirror neuron -- observation vs execution
+      labels:
+      - Observation
+      - Execution
+    canonical_root: data/canonical/DS42
+    sampling_rate_hz: 5
+    manifest: benchmark/manifests/DS42.csv
+    manifest_sha256: 026310df3239d90c429e06b369c7c729c5fcd6bffd9971247253dfc78b715c44
+    manifest_rows: 1713
+    class_counts:
+      Observation: 859
+      Execution: 854
+    index_csv: benchmark/fair_input/index/DS42.csv
+    folds:
+      1:
+        train_subjects:
+        - sub-6082
+        - sub-6083
+        - sub-6084
+        - sub-6086
+        - sub-6087
+        - sub-6090
+        - sub-6101
+        - sub-6105
+        - sub-6107
+        - sub-6109
+        - sub-6110
+        - sub-6115
+        validation_subjects:
+        - sub-6091
+        - sub-6106
+        - sub-6113
+        - sub-6116
+        test_subjects:
+        - sub-6085
+        - sub-6089
+        - sub-6108
+        - sub-6112
+        - sub-6114
+      2:
+        train_subjects:
+        - sub-6082
+        - sub-6083
+        - sub-6084
+        - sub-6085
+        - sub-6086
+        - sub-6089
+        - sub-6090
+        - sub-6105
+        - sub-6108
+        - sub-6109
+        - sub-6112
+        - sub-6114
+        - sub-6115
+        validation_subjects:
+        - sub-6087
+        - sub-6101
+        - sub-6107
+        - sub-6110
+        test_subjects:
+        - sub-6091
+        - sub-6106
+        - sub-6113
+        - sub-6116
+      3:
+        train_subjects:
+        - sub-6084
+        - sub-6085
+        - sub-6089
+        - sub-6090
+        - sub-6091
+        - sub-6106
+        - sub-6108
+        - sub-6109
+        - sub-6112
+        - sub-6113
+        - sub-6114
+        - sub-6115
+        - sub-6116
+        validation_subjects:
+        - sub-6082
+        - sub-6083
+        - sub-6086
+        - sub-6105
+        test_subjects:
+        - sub-6087
+        - sub-6101
+        - sub-6107
+        - sub-6110
+      4:
+        train_subjects:
+        - sub-6085
+        - sub-6087
+        - sub-6089
+        - sub-6091
+        - sub-6101
+        - sub-6106
+        - sub-6107
+        - sub-6108
+        - sub-6110
+        - sub-6112
+        - sub-6113
+        - sub-6114
+        - sub-6116
+        validation_subjects:
+        - sub-6084
+        - sub-6090
+        - sub-6109
+        - sub-6115
+        test_subjects:
+        - sub-6082
+        - sub-6083
+        - sub-6086
+        - sub-6105
+      5:
+        train_subjects:
+        - sub-6082
+        - sub-6083
+        - sub-6086
+        - sub-6087
+        - sub-6091
+        - sub-6101
+        - sub-6105
+        - sub-6106
+        - sub-6107
+        - sub-6110
+        - sub-6113
+        - sub-6116
+        validation_subjects:
+        - sub-6085
+        - sub-6089
+        - sub-6108
+        - sub-6112
+        - sub-6114
+        test_subjects:
+        - sub-6084
+        - sub-6090
+        - sub-6109
+        - sub-6115

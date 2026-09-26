@@ -1,0 +1,110 @@
+schema_version: 1
+name: geonirs_downstream
+status: canonical_downstream_source_of_truth
+
+protocol:
+  epochs: 30
+  early_stopping_patience: 15
+  batch_size: 16
+  optimizer: AdamW
+  weight_decay: 0.05
+  warmup_epochs: 3
+  scheduler: cosine_decay_after_warmup
+  min_lr: 1.0e-6
+  gradient_clip: 1.0
+  label_smoothing: 0.0
+  loss: class_weighted_cross_entropy
+  class_weight_rule: "N / (C * n_c), counted on the train split only"
+  selection_metric: validation_balanced_accuracy
+  seed: 810
+
+  input_policy: "identical rows; reshape/permute only; no padding, no cropping, no re-normalisation, no channel selection"
+
+methods:
+  ours_lp:
+    family: ours
+    head_lr: 1.0e-4
+    backbone: frozen
+  ours_lora:
+    family: ours
+    head_lr: 1.0e-4
+    lora_lr: 1.0e-4
+    rank: 4
+    alpha: 8.0
+    targets: all_nn_Linear
+    backbone: frozen_except_lora
+    lora_init: {a: random, b: zero}
+  ours_ft:
+    family: ours
+    head_lr: 1.0e-4
+    backbone_lr: 1.0e-5
+    frozen_modules:
+      - hbo_to_hbr_decoder
+      - hbr_to_hbo_decoder
+
+  jung_mae_lp:
+    family: vanilla_mae
+    head_lr: 1.0e-4
+    backbone: frozen
+  jung_mae_lora:
+    family: vanilla_mae
+    head_lr: 1.0e-4
+    lora_lr: 1.0e-4
+    rank: 4
+    alpha: 8.0
+    targets: all_nn_Linear
+    backbone: frozen_except_lora
+    lora_init: {a: random, b: zero}
+  jung_mae_ft:
+    family: vanilla_mae
+    head_lr: 1.0e-4
+    backbone_lr: 1.0e-5
+    backbone: encoder_only
+  cnn_1d:
+    family: baseline
+    lr: 1.0e-4
+  fnirs_t:
+    family: baseline
+    lr: 1.0e-4
+  fnirs_4d:
+    family: baseline
+    lr: 1.0e-4
+  fnirsnet:
+    family: baseline
+    lr: 1.0e-4
+  eegnet:
+    family: baseline
+    lr: 1.0e-4
+  moment_base:
+    family: baseline
+    lr: 1.0e-4
+
+  moment_lora:
+    family: baseline
+    lr: 1.0e-4
+    rank: 4
+    alpha: 8.0
+    targets: all_nn_Linear
+  mean_slope_lda:
+    family: classical
+  statistical_rbf_svm:
+    family: classical
+
+ours_methods: [ours_lp, ours_lora, ours_ft]
+baseline_methods: [cnn_1d, fnirs_t, fnirs_4d, fnirsnet, eegnet, moment_base, moment_lora]
+classical_methods: [mean_slope_lda, statistical_rbf_svm]
+
+mae_methods: [jung_mae_lp, jung_mae_lora, jung_mae_ft]
+
+classifier:
+  head_variant: flatten_linear
+  head_dropout: 0.1
+  patch_dropout: 0.0
+
+minimum_window_samples:
+  fnirs_t: 30
+
+grid:
+  datasets: all
+  folds: [1, 2, 3, 4, 5]
+  methods: all
